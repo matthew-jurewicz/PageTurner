@@ -39,12 +39,36 @@ void loop() {
   }
 }
 #else
+#include <Servo.h>
+
+Servo ds3218;
+int servoPin = 9, adjRest = 94, irPin = 3;
+int targetMs[2] = {1000 / targetFreq[0], 1000 / targetFreq[1]}; //1000 ms / hz
+unsigned long pulse[2] = {-1, -1};
+
 void setup() {
-  
+  Serial.begin(9600);
+  ds3218.attach(servoPin);
+  ds3218.write(adjRest);
 }
 
 void loop() {
-  
+  if(digitalRead(irPin) == HIGH) {
+    pulse[0] = millis();
+    if(pulse[1] != -1) {
+      int elapsed = pulse[0] - pulse[1];
+      if(elapsed == targetMs[0]) {
+        ds3219.write(0);
+      }
+      else if(elapsed == targetMs[1]) {
+        ds3219.write(180);
+      }
+      else {
+        ds3219.write(adjRest);
+      }
+    }
+    pulse[1] = pulse[0];
+  }
 }
 #endif
 
